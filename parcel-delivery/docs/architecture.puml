@@ -1,0 +1,43 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+skinparam linetype ortho
+
+LAYOUT_WITH_LEGEND()
+
+Person(client, "Клиент", "Оформляет посылку, отслеживает статус")
+Person(manager, "Менеджер", "Просматривает и управляет посылками")
+
+System_Boundary(c1, "Parcel Delivery System") {
+
+System_Boundary(c3, "Backend") {
+    Container(gateway, "API Gateway", "Ktor", "Маршрутизация, аутентификация")
+    Container(clients_service, "Профиль клиента", "Kotlin", "Управление профилями клиентов")
+    Container(parcels_service, "Сервис посылок", "Kotlin", "Отправка посылок, изменение статуса и предоставление отчета")
+    Container(notifications_service, "Сервис нотификации", "Kotlin", "Отправка уведомления об изменениии статуса")
+}
+System_Boundary(c4, "DataSources/Mesh") {
+    ContainerDb(database, "База данных", "PostgreSQL", "Хранение клиентов, посылок")
+    ContainerQueue(message_bus, "Kafka", "Message Broker", "Асинхронные события")
+}
+System_Boundary(c2, "Frontend") {
+    Container(web_client, "Frontend", "HTML + CSS + JS", "Интерфейс для клиентов и менеджеров")
+}
+}
+
+Rel(client, web_client, "Использует интерфейс клиента")
+Rel(manager, web_client, "Использует админ-панель")
+
+Rel(web_client, gateway, "HTTP/HTTPS", "JSON")
+
+Rel(gateway, clients_service, "Вызов API", "HTTP")
+Rel(gateway, parcels_service, "Вызов API", "HTTP")
+
+Rel(parcels_service, clients_service, "Проверяет клиента", "HTTP")
+Rel(parcels_service, database, "Читает/пишет", "JDBC")
+Rel(parcels_service, message_bus, "Публикует", "«ParcelCreated»")
+
+Rel(notifications_service, message_bus, "Подписывается", "«ParcelCreated»")
+Rel(notifications_service, client, "Отправляет уведомление", "Email/SMS")
+
+@enduml

@@ -1,0 +1,87 @@
+version: "3.8"
+
+services:
+  elasticsearch:
+    image: elasticsearch:7.17.24
+    container_name: parcel-delivery-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    networks:
+      - infra
+
+  logstash:
+    image: logstash:7.17.24
+    container_name: parcel-delivery-logstash
+    ports:
+      - "9600:9600"
+      - "5000:5000/tcp"
+      - "5000:5000/udp"
+    volumes:
+      - ./docker-compose/pipeline:/usr/share/logstash/pipeline:ro
+    environment:
+      - LS_JAVA_OPTS=-Xms256m -Xmx256m
+    depends_on:
+      - elasticsearch
+    networks:
+      - infra
+
+  kibana:
+    image: kibana:7.17.24
+    container_name: parcel-delivery-kibana
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - infra
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: parcel-delivery-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker-compose/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - infra
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: parcel-delivery-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}  # Используйте .env!
+      - GF_SERVER_ROOT_URL=/grafana  # Для nginx reverse proxy
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./docker-compose/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
+    networks:
+      - infra
+
+volumes:
+  elasticsearch-data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  infra:
+    driver: bridge

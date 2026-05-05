@@ -5,7 +5,7 @@
 ## Структура
 
 ```
-parecel-delivery-api/
+app/
 ├── build.gradle.kts                    # Конфигурация сборки модуля
 ├── README.md                           # Описание модуля
 └── src/
@@ -32,9 +32,9 @@ parecel-delivery-api/
 
 ```bash
 # Из корня проекта
-./gradlew :parcel-delivery:parcel-delivery-api:build
+./gradlew :parcel-delivery:app:build
 
 # Из директории parcel-delivery
 cd parcel-delivery
-../gradlew parcel-delivery-api:build
+../gradlew app:build
 ```
