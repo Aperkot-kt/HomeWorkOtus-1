@@ -1,14 +1,5 @@
-pluginManagement {
-    val kotlinVersion: String by settings
-    plugins {
-        kotlin("jvm") version kotlinVersion
-    }
-}
+rootProject.name = "kotlin-educational-project"
 
-plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
-}
-
-rootProject.name = "HomeWorkOtus"
-
-include(":submodule-1")
+includeBuild("lessons-modules")
+includeBuild("parcel-delivery")
+includeBuild("gradle-plugins")
