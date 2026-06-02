@@ -39,7 +39,7 @@ parcel-delivery/
 ./gradlew :parcel-delivery:build
 
 # Модуль app
-./gradlew :parcel-delivery:app:build
+./gradlew :parcel-delivery:parcel-delivery-app:build
 ```
 
 ## Docker
