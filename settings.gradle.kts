@@ -1,5 +1,4 @@
 rootProject.name = "kotlin-educational-project"
 
-includeBuild("lessons-modules")
-includeBuild("parcel-delivery")
-includeBuild("gradle-plugins")
+includeBuild(":app")
+includeBuild(":gradle-plugins")

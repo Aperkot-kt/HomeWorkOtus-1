@@ -1,5 +1,6 @@
+
 pluginManagement {
-    includeBuild("../gradle-plugins")
+    includeBuild("./gradle-plugins")
 
     repositories {
         mavenCentral()
@@ -9,4 +10,4 @@ pluginManagement {
 
 rootProject.name = "parcel-delivery"
 
-include("parcel-delivery-api")
+include("app")
