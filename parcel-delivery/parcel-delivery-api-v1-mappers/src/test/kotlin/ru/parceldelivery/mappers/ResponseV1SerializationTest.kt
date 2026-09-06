@@ -1,6 +1,7 @@
 package ru.parceldelivery.mappers
 
 import org.junit.jupiter.api.Test
+import java.time.OffsetDateTime
 import ru.parceldelivery.api.v1.models.DeliveryCreateResponse
 import ru.parceldelivery.api.v1.models.DeliveryDeleteResponse
 import ru.parceldelivery.api.v1.models.DeliveryInitResponse
@@ -36,7 +37,7 @@ class ResponseSerializationTest {
         dimensions = dimensions,
         status = ParcelStatus.ACCEPTED,
         deliveryAddress = "г. Санкт-Петербург, ул. Невский пр., д. 10",
-        createdAt = "2026-06-30T10:00:00Z"
+        createdAt = OffsetDateTime.parse("2026-06-30T10:00:00Z")
     )
 
     val response = DeliveryCreateResponse(
@@ -55,7 +56,7 @@ class ResponseSerializationTest {
     val updateResponse = DeliveryUpdateResponse(
         responseType = "update",
         result = ResponseResult.SUCCESS,
-        parcel = parcel.copy(status = ParcelStatus.IN_TRANSIT, updatedAt = "2026-06-30T15:00:00Z")
+        parcel = parcel.copy(status = ParcelStatus.IN_TRANSIT, updatedAt = OffsetDateTime.parse("2026-06-30T15:00:00Z"))
     )
 
     val deleteResponse = DeliveryDeleteResponse(
@@ -69,7 +70,7 @@ class ResponseSerializationTest {
         receiverId = receiverId,
         deliveryAddress = "г. Санкт-Петербург, ул. Невский пр., д. 10",
         status = ParcelStatus.IN_TRANSIT,
-        createdAt = "2026-06-30T10:00:00Z"
+        createdAt = OffsetDateTime.parse("2026-06-30T10:00:00Z")
     )
 
     val searchResponse = DeliverySearchResponse(

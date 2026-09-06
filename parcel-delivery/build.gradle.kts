@@ -18,7 +18,9 @@ subprojects {
 
 ext {
     val specDir = layout.projectDirectory.dir("./parcel-delivery-api-v1/src/resources/ru/parceldelivery/api.v1.spec")
-    set("spec-v1", specDir.file("parcel-deliveiry-v1-api.yaml").toString())
+    set("spec-v1", specDir.file("parcel-delivery-v1-api.yaml").toString())
+    val logSpecDir = layout.projectDirectory.dir("./parcel-delivery-api-log/src/resources/ru/parceldelivery/api.log.v1.spec")
+    set("spec-log-v1", logSpecDir.file("parcel-delivery-log-v1-api.yaml").toString())
 }
 
 tasks {

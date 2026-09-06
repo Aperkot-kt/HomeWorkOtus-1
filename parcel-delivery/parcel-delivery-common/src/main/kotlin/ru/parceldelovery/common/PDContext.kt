@@ -21,11 +21,11 @@ data class PDContext(
 
     var requestId: PDRequestId = PDRequestId.NONE,
     var timeStart: Instant = Instant.NONE,
-    var adRequest: PDParcel = PDParcel(),
-    var adFilterRequest: PDFilter = PDFilter(),
+    var pdRequest: PDParcel = PDParcel(),
+    var pdFilterRequest: PDFilter = PDFilter(),
 
     //для одиночного ответа
-    var adResponse: PDParcel = PDParcel(),
+    var pdResponse: PDParcel = PDParcel(),
     //для ответа-списка
-    var adsResponse: MutableList<PDParcel> = mutableListOf(),
+    var pdsResponse: MutableList<PDParcel> = mutableListOf(),
 )

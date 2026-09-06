@@ -37,7 +37,7 @@ class MappersV1FromTransportTest {
         }
 
         assertEquals(PDCommand.READ, context.command)
-        assertEquals(PDParcelId(trackNumber), context.adRequest.trackNumber)
+        assertEquals(PDParcelId(trackNumber), context.pdRequest.trackNumber)
     }
 
     @Test
@@ -56,7 +56,7 @@ class MappersV1FromTransportTest {
 
         assertEquals(PDCommand.CREATE, context.command)
 
-        val parcel = context.adRequest
+        val parcel = context.pdRequest
         assertEquals(PDParcelId.NONE, parcel.trackNumber)
         assertEquals(PDUserId(senderId), parcel.senderId)
         assertEquals(PDUserId(receiverId), parcel.receiverId)
@@ -80,8 +80,8 @@ class MappersV1FromTransportTest {
         }
 
         assertEquals(PDCommand.UPDATE, context.command)
-        assertEquals(PDParcelId(trackNumber), context.adRequest.trackNumber)
-        assertEquals(PDStatus.IN_TRANSIT, context.adRequest.status)
+        assertEquals(PDParcelId(trackNumber), context.pdRequest.trackNumber)
+        assertEquals(PDStatus.IN_TRANSIT, context.pdRequest.status)
     }
 
     @Test
@@ -91,7 +91,7 @@ class MappersV1FromTransportTest {
         }
 
         assertEquals(PDCommand.DELETE, context.command)
-        assertEquals(PDParcelId(trackNumber), context.adRequest.trackNumber)
+        assertEquals(PDParcelId(trackNumber), context.pdRequest.trackNumber)
     }
 
     @Test
@@ -108,9 +108,9 @@ class MappersV1FromTransportTest {
         }
 
         assertEquals(PDCommand.SEARCH, context.command)
-        assertEquals(PDStatus.IN_TRANSIT, context.adFilterRequest.status)
-        assertEquals(senderId, context.adFilterRequest.senderId)
-        assertEquals(receiverId, context.adFilterRequest.receiverId)
+        assertEquals(PDStatus.IN_TRANSIT, context.pdFilterRequest.status)
+        assertEquals(senderId, context.pdFilterRequest.senderId)
+        assertEquals(receiverId, context.pdFilterRequest.receiverId)
     }
 
     @Test
@@ -120,9 +120,9 @@ class MappersV1FromTransportTest {
         }
 
         assertEquals(PDCommand.SEARCH, context.command)
-        assertEquals(PDStatus.NONE, context.adFilterRequest.status)
-        assertNull(context.adFilterRequest.senderId)
-        assertNull(context.adFilterRequest.receiverId)
+        assertEquals(PDStatus.NONE, context.pdFilterRequest.status)
+        assertNull(context.pdFilterRequest.senderId)
+        assertNull(context.pdFilterRequest.receiverId)
     }
 
     @Test

@@ -32,17 +32,17 @@ fun PDContext.fromTransport(request: IRequest) = when (request) {
 
 fun PDContext.fromTransport(request: DeliveryReadRequest) {
     command = PDCommand.READ
-    adRequest = PDParcel(trackNumber = request.trackNumber.toPDId())
+    pdRequest = PDParcel(trackNumber = request.trackNumber.toPDId())
 }
 
 fun PDContext.fromTransport(request: DeliveryCreateRequest) {
     command = PDCommand.CREATE
-    adRequest = request.toInternal()
+    pdRequest = request.toInternal()
 }
 
 fun PDContext.fromTransport(request: DeliveryUpdateRequest) {
     command = PDCommand.UPDATE
-    adRequest = PDParcel(
+    pdRequest = PDParcel(
         trackNumber = request.trackNumber.toPDId(),
         status = request.status.fromTransport(),
         senderId = request.senderId?.let { PDUserId(it) } ?: PDUserId.NONE,
@@ -52,12 +52,12 @@ fun PDContext.fromTransport(request: DeliveryUpdateRequest) {
 
 fun PDContext.fromTransport(request: DeliveryDeleteRequest) {
     command = PDCommand.DELETE
-    adRequest = PDParcel(trackNumber = request.trackNumber.toPDId())
+    pdRequest = PDParcel(trackNumber = request.trackNumber.toPDId())
 }
 
 fun PDContext.fromTransport(request: DeliverySearchRequest) {
     command = PDCommand.SEARCH
-    adFilterRequest = request.toInternal()
+    pdFilterRequest = request.toInternal()
 }
 
 private fun DeliveryCreateRequest.toInternal() = PDParcel(
