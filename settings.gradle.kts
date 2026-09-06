@@ -1,4 +1,12 @@
+pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
 rootProject.name = "kotlin-educational-project"
 
-includeBuild(":app")
-includeBuild(":gradle-plugins")
+includeBuild("lessons-modules")
+includeBuild("parcel-delivery")
+includeBuild("gradle-plugins")

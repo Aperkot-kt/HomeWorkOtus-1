@@ -1,0 +1,642 @@
+openapi: "3.0.3"
+info:
+  title: API доставки посылок V1
+  version: "1.0.0"
+  description: |
+    API для управления операциями доставки посылок.
+
+    Поддерживаемые операции:
+    - **Create** — регистрация новой посылки с данными отправителя, получателя, весом и габаритами
+    - **Read** — получение подробной информации о посылке по трек-номеру
+    - **Update** — изменение статуса посылки (с триггером уведомлений)
+    - **Delete** — удаление записи о посылке
+    - **Search** — фильтрация посылок по статусу, ФИО отправителя или получателя (для отчётов)
+
+servers:
+  - url: http://localhost:8080/v1
+    description: Сервер локальной разработки
+
+tags:
+  - name: parcel
+    description: Операции над посылками (создание, чтение, обновление, удаление, поиск)
+
+paths:
+  /parcels:
+    post:
+      tags:
+        - parcel
+      summary: Создать новую посылку или выполнить командную операцию
+      description: |
+        Принимает запрос с полем-дискриминатором `requestType`, определяющим
+        тип операции: `create`, `read`, `update`, `delete` или `search`.
+      operationId: executeParcelCommand
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IRequest'
+            examples:
+              create:
+                summary: Создание посылки
+                value:
+                  requestType: "create"
+                  senderId: "CL-1001"
+                  receiverId: "CL-1002"
+                  weight: 5.5
+                  dimensions:
+                    length: 40
+                    width: 30
+                    height: 20
+              search:
+                summary: Поиск посылок
+                value:
+                  requestType: "search"
+                  status: "IN_TRANSIT"
+                  senderId: "CL-1001"
+                  receiverId: "CL-1002"
+      responses:
+        "200":
+          description: Команда выполнена успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IResponse'
+              examples:
+                createSuccess:
+                  summary: Посылка создана
+                  value:
+                    responseType: "create"
+                    result: "success"
+                    trackNumber: "PD-2026-000001"
+                    parcel:
+                      trackNumber: "PD-2026-000001"
+                      status: "ACCEPTED"
+                      createdAt: "2026-06-30T10:00:00Z"
+                searchSuccess:
+                  summary: Результаты поиска
+                  value:
+                    responseType: "search"
+                    result: "success"
+                    parcels:
+                      - trackNumber: "PD-2026-000001"
+                        senderId: "CL-1001"
+                        receiverId: "CL-1002"
+                        deliveryAddress: "г. Санкт-Петербург, ул. Невский пр., д. 10"
+                        status: "IN_TRANSIT"
+        "400":
+          description: Неверный запрос — ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IResponse'
+              example:
+                responseType: "create"
+                result: "error"
+                errors:
+                  - code: "REQUIRED_FIELD"
+                    group: "sender"
+                    field: "senderId"
+                    message: "Идентификатор отправителя обязателен"
+        "500":
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IResponse'
+
+    get:
+      tags:
+        - parcel
+      summary: Поиск посылок
+      description: |
+        Возвращает список посылок, отфильтрованный по необязательным параметрам запроса
+      operationId: searchParcels
+      parameters:
+        - name: status
+          in: query
+          description: Фильтр по статусу посылки
+          schema:
+            $ref: '#/components/schemas/ParcelStatus'
+        - name: senderId
+          in: query
+          description: Фильтр по идентификатору клиента-отправителя
+          schema:
+            type: string
+            example: "CL-1001"
+        - name: receiverId
+          in: query
+          description: Фильтр по идентификатору клиента-получателя
+          schema:
+            type: string
+            example: "CL-1002"
+      responses:
+        "200":
+          description: Список посылок, соответствующих критериям
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ParcelSummary'
+              example:
+                - trackNumber: "PD-2026-000001"
+                  senderId: "CL-1001"
+                  receiverId: "CL-1002"
+                  deliveryAddress: "г. Санкт-Петербург, ул. Невский пр., д. 10"
+                  status: "IN_TRANSIT"
+                  createdAt: "2026-06-30T10:00:00Z"
+        "400":
+          description: Неверный запрос
+        "500":
+          description: Внутренняя ошибка сервера
+
+  /parcels/{trackNumber}:
+    get:
+      tags:
+        - parcel
+      summary: Получение информации о посылке по трек-номеру
+      description: |
+        Получение полной информации о посылке
+      operationId: readParcel
+      parameters:
+        - name: trackNumber
+          in: path
+          required: true
+          description: Уникальный трек-номер посылки
+          schema:
+            type: string
+            example: "PD-2026-000001"
+      responses:
+        "200":
+          description: Подробная информация о посылке
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Parcel'
+              example:
+                trackNumber: "PD-2026-000001"
+                senderId: "CL-1001"
+                receiverId: "CL-1002"
+                weight: 5.5
+                dimensions:
+                  length: 40
+                  width: 30
+                  height: 20
+                status: "IN_TRANSIT"
+                deliveryAddress: "г. Санкт-Петербург, ул. Невский пр., д. 10"
+                createdAt: "2026-06-30T10:00:00Z"
+                updatedAt: "2026-06-30T14:30:00Z"
+        "404":
+          description: Посылка не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IResponse'
+              example:
+                responseType: "read"
+                result: "error"
+                errors:
+                  - code: "NOT_FOUND"
+                    message: "Посылка с таким номером не найдена"
+        "500":
+          description: Внутренняя ошибка сервера
+
+    delete:
+      tags:
+        - parcel
+      summary: Удаление посылки по трек-номеру
+      description: Удаление записи о посылке из системы.
+      operationId: deleteParcel
+      parameters:
+        - name: trackNumber
+          in: path
+          required: true
+          description: Уникальный трек-номер посылки
+          schema:
+            type: string
+            example: "PD-2026-000001"
+      responses:
+        "200":
+          description: Посылка успешно удалена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IResponse'
+              example:
+                responseType: "delete"
+                result: "success"
+        "404":
+          description: Посылка не найдена
+        "500":
+          description: Внутренняя ошибка сервера
+
+  /parcels/{trackNumber}/status:
+    patch:
+      tags:
+        - parcel
+      summary: Обновление статуса посылки
+      description: |
+        Ручное изменение статуса посылки
+      operationId: updateParcelStatus
+      parameters:
+        - name: trackNumber
+          in: path
+          required: true
+          description: Уникальный трек-номер посылки
+          schema:
+            type: string
+            example: "PD-2026-000001"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelStatusUpdateRequest'
+            example:
+              status: "IN_TRANSIT"
+      responses:
+        "200":
+          description: Статус успешно обновлён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IResponse'
+              example:
+                responseType: "update"
+                result: "success"
+                parcel:
+                  trackNumber: "PD-2026-000001"
+                  status: "IN_TRANSIT"
+                  updatedAt: "2026-06-30T15:00:00Z"
+        "400":
+          description: Неверный запрос
+        "404":
+          description: Посылка не найдена
+        "500":
+          description: Внутренняя ошибка сервера
+
+components:
+  schemas:
+    RequestType:
+      type: string
+      description: Поле-дискриминатор для определения типа операции
+      enum:
+        - create
+        - read
+        - update
+        - delete
+        - search
+      example: create
+    IRequest:
+      type: object
+      description: Базовый интерфейс для всех запросов
+      properties:
+        requestType:
+          $ref: '#/components/schemas/RequestType'
+      discriminator:
+        propertyName: requestType
+        mapping:
+          create: '#/components/schemas/DeliveryCreateRequest'
+          read: '#/components/schemas/DeliveryReadRequest'
+          update: '#/components/schemas/DeliveryUpdateRequest'
+          delete: '#/components/schemas/DeliveryDeleteRequest'
+          search: '#/components/schemas/DeliverySearchRequest'
+
+    IResponse:
+      type: object
+      description: Базовый интерфейс для всех ответов
+      properties:
+        responseType:
+          type: string
+          description: Поле-дискриминатор для определения типа ответа
+          example: create
+        result:
+          $ref: '#/components/schemas/ResponseResult'
+        errors:
+          type: array
+          description: Список ошибок (не пустой при result=error)
+          items:
+            $ref: '#/components/schemas/Error'
+      discriminator:
+        propertyName: responseType
+        mapping:
+          create: '#/components/schemas/DeliveryCreateResponse'
+          read: '#/components/schemas/DeliveryReadResponse'
+          update: '#/components/schemas/DeliveryUpdateResponse'
+          delete: '#/components/schemas/DeliveryDeleteResponse'
+          search: '#/components/schemas/DeliverySearchResponse'
+          init: '#/components/schemas/DeliveryInitResponse'
+    ResponseResult:
+      type: string
+      enum:
+        - success
+        - error
+    Error:
+      type: object
+      description: Описание ошибки валидации или бизнес-логики
+      properties:
+        code:
+          type: string
+          description: Уникальный код ошибки
+          example: "REQUIRED_FIELD"
+        group:
+          type: string
+          description: Логическая группа, к которой относится ошибка
+          example: "sender"
+        field:
+          type: string
+          description: Имя поля, вызвавшего ошибку
+          example: "fullName"
+        message:
+          type: string
+          description: Человеко-читаемое описание ошибки
+          example: "ФИО отправителя обязательно"
+      required:
+        - code
+        - message
+    ParcelDimensions:
+      type: object
+      description: |
+        Габариты посылки (длина × ширина × высота в см)
+      properties:
+        length:
+          type: number
+          format: double
+          description: Длина в см
+          example: 40
+          minimum: 0
+        width:
+          type: number
+          format: double
+          description: Ширина в см
+          example: 30
+          minimum: 0
+        height:
+          type: number
+          format: double
+          description: Высота в см
+          example: 20
+          minimum: 0
+      required:
+        - length
+        - width
+        - height
+
+    ParcelStatus:
+      type: string
+      description: |
+        Статус посылки
+      enum:
+        - ACCEPTED       # Принято
+        - IN_TRANSIT     # В пути
+        - PENDING_DELIVERY # Ожидает вручения
+        - DELIVERED      # Доставлено
+    Parcel:
+      type: object
+      description: Полная информация о посылке
+      properties:
+        trackNumber:
+          type: string
+          description: Уникальный трек-номер посылки (генерируется системой)
+          example: "PD-2026-000001"
+        senderId:
+          type: string
+          description: Идентификатор клиента-отправителя
+          example: "CL-1001"
+        receiverId:
+          type: string
+          description: Идентификатор клиента-получателя
+          example: "CL-1002"
+        weight:
+          type: number
+          format: double
+          description: Вес посылки в кг
+          example: 5.5
+          minimum: 0
+        dimensions:
+          $ref: '#/components/schemas/ParcelDimensions'
+        status:
+          $ref: '#/components/schemas/ParcelStatus'
+        deliveryAddress:
+          type: string
+          description: Адрес доставки (адрес получателя)
+          example: "г. Санкт-Петербург, ул. Невский пр., д. 10"
+        createdAt:
+          type: string
+          description: Дата и время создания посылки
+          format: date-time
+          example: "2026-06-30T10:00:00Z"
+        updatedAt:
+          type: string
+          description: Дата и время последнего изменения
+          format: date-time
+          example: "2026-06-30T14:30:00Z"
+      required:
+        - trackNumber
+        - senderId
+        - receiverId
+        - weight
+        - dimensions
+        - status
+        - deliveryAddress
+        - createdAt
+    ParcelSummary:
+      type: object
+      description: |
+        Краткая информация о посылке для результатов поиска и отчётов.
+      properties:
+        trackNumber:
+          type: string
+          example: "PD-2026-000001"
+        senderId:
+          type: string
+          description: Идентификатор клиента-отправителя
+          example: "CL-1001"
+        receiverId:
+          type: string
+          description: Идентификатор клиента-получателя
+          example: "CL-1002"
+        deliveryAddress:
+          type: string
+          example: "г. Санкт-Петербург, ул. Невский пр., д. 10"
+        status:
+          $ref: '#/components/schemas/ParcelStatus'
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-06-30T10:00:00Z"
+      required:
+        - trackNumber
+        - senderId
+        - receiverId
+        - deliveryAddress
+        - status
+    DeliveryCreateRequest:
+      allOf:
+        - $ref: '#/components/schemas/IRequest'
+        - type: object
+          description: |
+            Запрос на создание посылки
+          properties:
+            senderId:
+              type: string
+              description: Идентификатор клиента-отправителя
+              example: "CL-1001"
+            receiverId:
+              type: string
+              description: Идентификатор клиента-получателя
+              example: "CL-1002"
+            weight:
+              type: number
+              format: double
+              description: Вес посылки в кг
+              minimum: 0
+              example: 5.5
+            dimensions:
+              $ref: '#/components/schemas/ParcelDimensions'
+          required:
+            - requestType
+            - senderId
+            - receiverId
+            - weight
+            - dimensions
+    DeliveryReadRequest:
+      allOf:
+        - $ref: '#/components/schemas/IRequest'
+        - type: object
+          description: Запрос на чтение посылки по трек-номеру
+          properties:
+            trackNumber:
+              type: string
+              description: Трек-номер посылки
+              example: "PD-2026-000001"
+          required:
+            - requestType
+            - trackNumber
+
+    DeliveryUpdateRequest:
+      allOf:
+        - $ref: '#/components/schemas/IRequest'
+        - type: object
+          description: |
+            Запрос на обновление посылки
+          properties:
+            trackNumber:
+              type: string
+              description: Трек-номер посылки
+              example: "PD-2026-000001"
+            senderId:
+              type: string
+              description: Идентификатор клиента-отправителя
+              example: "CL-1001"
+            receiverId:
+              type: string
+              description: Идентификатор клиента-получателя
+              example: "CL-1002"
+            status:
+              $ref: '#/components/schemas/ParcelStatus'
+          required:
+            - requestType
+            - trackNumber
+            - status
+
+    DeliveryDeleteRequest:
+      allOf:
+        - $ref: '#/components/schemas/IRequest'
+        - type: object
+          description: Запрос на удаление посылки по трек-номеру
+          properties:
+            trackNumber:
+              type: string
+              description: Трек-номер посылки
+              example: "PD-2026-000001"
+          required:
+            - requestType
+            - trackNumber
+
+    DeliverySearchRequest:
+      allOf:
+        - $ref: '#/components/schemas/IRequest'
+        - type: object
+          description: |
+            Запрос на поиск посылок с фильтрацией.
+          properties:
+            status:
+              $ref: '#/components/schemas/ParcelStatus'
+            senderId:
+              type: string
+              description: Идентификатор клиента-отправителя
+              example: "CL-1001"
+            receiverId:
+              type: string
+              description: Идентификатор клиента-получателя
+              example: "CL-1002"
+          required:
+            - requestType
+    ParcelStatusUpdateRequest:
+      type: object
+      description: Запрос на изменение статуса посылки
+      properties:
+        status:
+          $ref: '#/components/schemas/ParcelStatus'
+      required:
+        - status
+    DeliveryCreateResponse:
+      allOf:
+        - $ref: '#/components/schemas/IResponse'
+        - type: object
+          description: Ответ на создание посылки
+          properties:
+            trackNumber:
+              type: string
+              description: Сгенерированный трек-номер
+              example: "PD-2026-000001"
+            parcel:
+              $ref: '#/components/schemas/Parcel'
+    DeliveryReadResponse:
+      allOf:
+        - $ref: '#/components/schemas/IResponse'
+        - type: object
+          description: Ответ на чтение посылки
+          properties:
+            parcel:
+              $ref: '#/components/schemas/Parcel'
+    DeliveryUpdateResponse:
+      allOf:
+        - $ref: '#/components/schemas/IResponse'
+        - type: object
+          description: Ответ на обновление посылки
+          properties:
+            parcel:
+              $ref: '#/components/schemas/Parcel'
+    DeliveryDeleteResponse:
+      allOf:
+        - $ref: '#/components/schemas/IResponse'
+        - type: object
+          description: Ответ на удаление посылки
+    DeliverySearchResponse:
+      allOf:
+        - $ref: '#/components/schemas/IResponse'
+        - type: object
+          description: Ответ на поиск посылок
+          properties:
+            parcels:
+              type: array
+              description: Список найденных посылок
+              items:
+                $ref: '#/components/schemas/ParcelSummary'
+    DeliveryInitResponse:
+      allOf:
+        - $ref: '#/components/schemas/IResponse'
+        - type: object
+          description: Ответ с информацией об инициализации сервиса
+          properties:
+            version:
+              type: string
+              description: Версия API
+              example: "1.0.0"
+            status:
+              type: string
+              description: Статус сервиса
+              example: "running"
