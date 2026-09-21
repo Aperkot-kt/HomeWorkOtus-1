@@ -5,7 +5,7 @@ plugins {
 
 openApiGenerate {
     generatorName.set("kotlin")
-    inputSpec.set("${projectDir}/src/resources/ru/parceldelivery/api.v1.spec/parcel-deliveiry-v1-api.yaml")
+    inputSpec.set("${projectDir}/src/resources/ru/parceldelivery/api.v1.spec/parcel-delivery-v1-api.yaml")
     outputDir.set(layout.buildDirectory.dir("generated").get().asFile.absolutePath)
     packageName.set("ru.parceldelivery.api.v1")
     modelPackage.set("ru.parceldelivery.api.v1.models")

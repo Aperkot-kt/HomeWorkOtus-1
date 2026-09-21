@@ -45,7 +45,7 @@ class MappersV1ToTransportTest {
 
     @Test
     fun `create context maps to DeliveryCreateResponse with full parcel`() {
-        val context = PDContext(command = PDCommand.CREATE, adResponse = fullParcel())
+        val context = PDContext(command = PDCommand.CREATE, pdResponse = fullParcel())
 
         val response = assertIs<DeliveryCreateResponse>(context.toTransport())
 
@@ -69,7 +69,7 @@ class MappersV1ToTransportTest {
 
     @Test
     fun `read context maps to DeliveryReadResponse`() {
-        val context = PDContext(command = PDCommand.READ, adResponse = fullParcel())
+        val context = PDContext(command = PDCommand.READ, pdResponse = fullParcel())
 
         val response = assertIs<DeliveryReadResponse>(context.toTransport())
 
@@ -81,7 +81,7 @@ class MappersV1ToTransportTest {
 
     @Test
     fun `update context maps status to DeliveryUpdateResponse`() {
-        val context = PDContext(command = PDCommand.UPDATE, adResponse = fullParcel(status = PDStatus.IN_TRANSIT))
+        val context = PDContext(command = PDCommand.UPDATE, pdResponse = fullParcel(status = PDStatus.IN_TRANSIT))
 
         val response = assertIs<DeliveryUpdateResponse>(context.toTransport())
 
@@ -103,7 +103,7 @@ class MappersV1ToTransportTest {
     fun `search context maps parcels to summaries`() {
         val context = PDContext(
             command = PDCommand.SEARCH,
-            adsResponse = mutableListOf(
+            pdsResponse = mutableListOf(
                 fullParcel(trackNumber = "PD-2026-000001", status = PDStatus.ACCEPTED),
                 fullParcel(trackNumber = "PD-2026-000002", status = PDStatus.IN_TRANSIT)
             )
@@ -141,7 +141,7 @@ class MappersV1ToTransportTest {
 
     @Test
     fun `context with errors maps to error result with mapped errors`() {
-        val context = PDContext(command = PDCommand.READ, adResponse = fullParcel())
+        val context = PDContext(command = PDCommand.READ, pdResponse = fullParcel())
         context.errors += PDError(
             code = "NOT_FOUND",
             group = "delivery",
@@ -169,28 +169,28 @@ class MappersV1ToTransportTest {
 
     @Test
     fun `parcel without status is rejected`() {
-        val context = PDContext(command = PDCommand.READ, adResponse = fullParcel().copy(status = null))
+        val context = PDContext(command = PDCommand.READ, pdResponse = fullParcel().copy(status = null))
 
         assertFailsWith<IllegalStateException> { context.toTransport() }
     }
 
     @Test
     fun `parcel with NONE status is rejected`() {
-        val context = PDContext(command = PDCommand.READ, adResponse = fullParcel().copy(status = PDStatus.NONE))
+        val context = PDContext(command = PDCommand.READ, pdResponse = fullParcel().copy(status = PDStatus.NONE))
 
         assertFailsWith<IllegalStateException> { context.toTransport() }
     }
 
     @Test
     fun `parcel without senderId is rejected`() {
-        val context = PDContext(command = PDCommand.READ, adResponse = fullParcel().copy(senderId = PDUserId.NONE))
+        val context = PDContext(command = PDCommand.READ, pdResponse = fullParcel().copy(senderId = PDUserId.NONE))
 
         assertFailsWith<IllegalArgumentException> { context.toTransport() }
     }
 
     @Test
     fun `parcel without created at is rejected`() {
-        val context = PDContext(command = PDCommand.READ, adResponse = fullParcel().copy(createdAt = null))
+        val context = PDContext(command = PDCommand.READ, pdResponse = fullParcel().copy(createdAt = null))
 
         assertFailsWith<IllegalArgumentException> { context.toTransport() }
     }

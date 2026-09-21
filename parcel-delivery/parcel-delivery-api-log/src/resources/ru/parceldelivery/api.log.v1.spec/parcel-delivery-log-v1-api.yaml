@@ -1,0 +1,140 @@
+openapi: "3.0.3"
+info:
+  title: API доставки посылок — логирование (log1)
+  version: "1.0.0"
+  description: |
+    Спецификация моделей логирования (log1).
+
+    Описывает структуру записей лога операций приложения parcel-delivery:
+    - **CommonLogModel** — общая запись лога (время, id лога, источник, данные операции, ошибки)
+    - **PDLogModel** — данные операции с посылкой (запрос, ответ, фильтр)
+    - **ParcelLog** — лог-представление посылки
+    - **ParcelFilterLog** — лог-представление фильтра поиска
+    - **ErrorLogModel** — лог-представление ошибки
+
+    Спецификация содержит только модели (без endpoints): генерируются
+    только Kotlin-модели для сериализации логов.
+
+paths: {}
+
+components:
+  schemas:
+    CommonLogModel:
+      type: object
+      description: Общая запись лога операций приложения
+      properties:
+        messageTime:
+          type: string
+          description: Время создания записи лога (ISO-8601)
+          example: "2026-09-07T10:00:00Z"
+        logId:
+          type: string
+          description: Уникальный идентификатор записи лога
+          example: "log-2026-000001"
+        source:
+          type: string
+          description: Источник записи лога (имя приложения)
+          example: "parcel-delivery-app"
+        parcel:
+          $ref: '#/components/schemas/PDLogModel'
+        errors:
+          type: array
+          description: Список ошибок операции
+          items:
+            $ref: '#/components/schemas/ErrorLogModel'
+
+    PDLogModel:
+      type: object
+      description: "Данные операции с посылкой: идентификатор запроса, входящие и исходящие данные, фильтр"
+      properties:
+        requestId:
+          type: string
+          description: Идентификатор запроса
+          example: "req-1"
+        requestParcel:
+          $ref: '#/components/schemas/ParcelLog'
+        responseParcel:
+          $ref: '#/components/schemas/ParcelLog'
+        responseParcels:
+          type: array
+          description: Список посылок в ответе (для операций поиска)
+          items:
+            $ref: '#/components/schemas/ParcelLog'
+        requestFilter:
+          $ref: '#/components/schemas/ParcelFilterLog'
+
+    ParcelLog:
+      type: object
+      description: Лог-представление посылки
+      properties:
+        trackNumber:
+          type: string
+          description: Уникальный трек-номер посылки
+          example: "PD-2026-000001"
+        senderId:
+          type: string
+          description: Идентификатор клиента-отправителя
+          example: "CL-1001"
+        receiverId:
+          type: string
+          description: Идентификатор клиента-получателя
+          example: "CL-1002"
+        weight:
+          type: number
+          format: double
+          description: Вес посылки в кг
+          example: 5.5
+        status:
+          type: string
+          description: Статус посылки
+          example: "IN_TRANSIT"
+        deliveryAddress:
+          type: string
+          description: Адрес доставки (адрес получателя)
+          example: "г. Санкт-Петербург, ул. Невский пр., д. 10"
+        createdAt:
+          type: string
+          description: Дата и время создания посылки (ISO-8601)
+          example: "2026-06-30T10:00:00Z"
+        updatedAt:
+          type: string
+          description: Дата и времени последнего изменения (ISO-8601)
+          example: "2026-06-30T14:30:00Z"
+
+    ParcelFilterLog:
+      type: object
+      description: Лог-представление фильтра поиска посылок
+      properties:
+        status:
+          type: string
+          description: Фильтр по статусу посылки
+          example: "IN_TRANSIT"
+        senderId:
+          type: string
+          description: Фильтр по идентификатору клиента-отправителя
+          example: "CL-1001"
+        receiverId:
+          type: string
+          description: Фильтр по идентификатору клиента-получателя
+          example: "CL-1002"
+
+    ErrorLogModel:
+      type: object
+      description: Лог-представление ошибки
+      properties:
+        code:
+          type: string
+          description: Уникальный код ошибки
+          example: "REQUIRED_FIELD"
+        field:
+          type: string
+          description: Имя поля, вызвавшего ошибку
+          example: "senderId"
+        message:
+          type: string
+          description: Человеко-читаемое описание ошибки
+          example: "Идентификатор отправителя обязателен"
+        level:
+          type: string
+          description: Уровень логирования ошибки
+          example: "ERROR"

@@ -34,20 +34,20 @@ fun PDContext.toTransport(): IResponse = when (command) {
 fun PDContext.toTransportCreate(): DeliveryCreateResponse = DeliveryCreateResponse(
     result = result,
     errors = transportErrors,
-    trackNumber = adResponse.trackNumber.toString(),
-    parcel = adResponse.toTransport()
+    trackNumber = pdResponse.trackNumber.toString(),
+    parcel = pdResponse.toTransport()
 )
 
 fun PDContext.toTransportRead(): DeliveryReadResponse = DeliveryReadResponse(
     result = result,
     errors = transportErrors,
-    parcel = adResponse.toTransport()
+    parcel = pdResponse.toTransport()
 )
 
 fun PDContext.toTransportUpdate(): DeliveryUpdateResponse = DeliveryUpdateResponse(
     result = result,
     errors = transportErrors,
-    parcel = adResponse.toTransport()
+    parcel = pdResponse.toTransport()
 )
 
 fun PDContext.toTransportDelete(): DeliveryDeleteResponse = DeliveryDeleteResponse(
@@ -58,7 +58,7 @@ fun PDContext.toTransportDelete(): DeliveryDeleteResponse = DeliveryDeleteRespon
 fun PDContext.toTransportSearch(): DeliverySearchResponse = DeliverySearchResponse(
     result = result,
     errors = transportErrors,
-    parcels = adsResponse.map { it.toTransportSummary() }
+    parcels = pdsResponse.map { it.toTransportSummary() }
 )
 
 private val PDContext.result: ResponseResult
