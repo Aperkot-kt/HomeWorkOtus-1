@@ -18,7 +18,8 @@ dependencyResolutionManagement {
     }
 }
 
-
+include("parcel-delivery-lib")
+include("parcel-delivery-biz")
 include("parcel-delivery-api-v1")
 include("parcel-delivery-common")
 include("parcel-delivery-api-v1-mappers")
