@@ -41,4 +41,7 @@ dependencies {
     implementation(project(":parcel-delivery-common"))
     implementation(libs.kotlinx.datetime)
     implementation(libs.jackson.module.kotlin)
+    implementation(libs.slf4j.api)
+
+    testImplementation(libs.logback.classic)
 }

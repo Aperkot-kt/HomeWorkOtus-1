@@ -15,14 +15,14 @@ import ru.parceldelivery.app.biz.validation.validateSenderIdNotBlank
 import ru.parceldelivery.app.biz.validation.validateReceiverIdNotBlank
 import ru.parceldelivery.app.lib.ICorChainDsl
 import ru.parceldelivery.app.lib.chain
-import ru.parceldelovery.common.models.PDState
+import ru.parceldelivery.common.models.PDState
 import ru.parceldelivery.app.biz.stubs.stubValidationBadDeliveryAddress
 import ru.parceldelivery.app.biz.stubs.stubValidationBadReceiverId
 import ru.parceldelivery.app.biz.stubs.stubValidationBadSenderId
 import ru.parceldelivery.app.biz.validation.validateDeliveryAddressNotBlank
-import ru.parceldelovery.common.PDContext
-import ru.parceldelovery.common.models.PDCommand
-import ru.parceldelovery.common.models.PDWorkMode
+import ru.parceldelivery.common.PDContext
+import ru.parceldelivery.common.models.PDCommand
+import ru.parceldelivery.common.models.PDWorkMode
 
 fun ICorChainDsl<PDContext>.parcelCreate() = operation(PDCommand.CREATE) {
     stubs {

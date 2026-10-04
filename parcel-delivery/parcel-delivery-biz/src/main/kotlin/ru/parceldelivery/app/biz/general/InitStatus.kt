@@ -1,9 +1,9 @@
 package ru.parceldelivery.app.biz.general
 
-import ru.parceldelovery.common.PDContext
+import ru.parceldelivery.common.PDContext
 import ru.parceldelivery.app.lib.ICorChainDsl
 import ru.parceldelivery.app.lib.worker
-import ru.parceldelovery.common.models.PDState
+import ru.parceldelivery.common.models.PDState
 
 fun ICorChainDsl<PDContext>.initStatus(title: String = "Инициализация статуса") = worker(title) {
     state = PDState.RUNNING

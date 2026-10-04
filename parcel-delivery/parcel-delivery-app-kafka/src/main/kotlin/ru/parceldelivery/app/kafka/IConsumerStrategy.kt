@@ -1,6 +1,6 @@
 package ru.parceldelivery.app.kafka
 
-import ru.parceldelovery.common.PDContext
+import ru.parceldelivery.common.PDContext
 import ru.parceldelivery.app.kafka.AppKafkaConfig
 /**
  * Интерфейс стратегии для обслуживания версии API

@@ -8,7 +8,7 @@ import ru.parceldelivery.app.biz.operations.parcelSearch
 import ru.parceldelivery.app.biz.operations.parcelUpdate
 import ru.parceldelivery.app.common.IPDProcessor
 import ru.parceldelivery.app.lib.rootChain
-import ru.parceldelovery.common.PDContext
+import ru.parceldelivery.common.PDContext
 
 class PDProcessor : IPDProcessor {
     override suspend fun exec(ctx: PDContext) = businessChain.exec(ctx)

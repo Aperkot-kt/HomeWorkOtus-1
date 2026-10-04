@@ -29,5 +29,12 @@ include("parcel-delivery-app-kafka")
 include("parcel-delivery-app-spring")
 include("parcel-delivery-stubs")
 include("parcel-delivery-api-log")
+//DB
+include(":parcel-delivery-repo-common")
+include(":parcel-delivery-repo-inmemory")
+include(":parcel-delivery-repo-tests")
+include(":parcel-delivery-repo-pg")
+include(":parcel-delivery-other")
+include(":parcel-delivery-other:pd-migration-pg")
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

@@ -6,7 +6,7 @@ import ru.parceldelivery.mappers.apiV1RequestDeserialize
 import ru.parceldelivery.mappers.apiV1ResponseSerialize
 import ru.parceldelivery.mappers.fromTransport
 import ru.parceldelivery.mappers.toTransport
-import ru.parceldelovery.common.PDContext
+import ru.parceldelivery.common.PDContext
 import ru.parceldelivery.app.kafka.AppKafkaConfig
 
 class ConsumerStrategyV1 : IConsumerStrategy {
