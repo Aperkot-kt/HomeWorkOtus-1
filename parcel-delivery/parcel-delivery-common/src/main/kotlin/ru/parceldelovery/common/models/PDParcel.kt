@@ -13,7 +13,7 @@ data class PDParcel(
     /** Идентификатор клиента-получателя */
     val receiverId: PDUserId = PDUserId.NONE,
     /** Вес посылки в кг */
-    val weight: Double? = null,
+    val weight: Double = 0.0,
     val dimensions: PDParcelDimensions? = null,
     val status: PDStatus? = null,
     /** Адрес доставки (адрес получателя) */
