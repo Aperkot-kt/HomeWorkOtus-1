@@ -1,9 +1,9 @@
 package ru.parceldelivery.app.biz.general
 
-import ru.parceldelovery.common.PDContext
+import ru.parceldelivery.common.PDContext
 import ru.parceldelivery.app.lib.ICorChainDsl
 import ru.parceldelivery.app.lib.chain
-import ru.parceldelovery.common.models.PDCommand
+import ru.parceldelivery.common.models.PDCommand
 
 fun ICorChainDsl<PDContext>.operation(
     command: PDCommand,

@@ -24,5 +24,9 @@ gradlePlugin {
             id = "multiplatform-convention"
             implementationClass = "ru.otus.kotlin.plugins.MultiplatformModulePlugin"
         }
+        create("build-docker") {
+            id = "build-docker"
+            implementationClass = "ru.otus.kotlin.plugins.DockerModulePlugin"
+        }
     }
 }

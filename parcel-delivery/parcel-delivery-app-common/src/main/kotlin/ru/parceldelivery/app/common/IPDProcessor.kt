@@ -1,6 +1,6 @@
 package ru.parceldelivery.app.common
 
-import ru.parceldelovery.common.PDContext
+import ru.parceldelivery.common.PDContext
 
 interface IPDProcessor {
     suspend fun exec(ctx: PDContext)

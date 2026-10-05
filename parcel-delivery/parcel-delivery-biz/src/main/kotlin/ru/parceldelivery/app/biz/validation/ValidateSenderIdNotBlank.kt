@@ -1,11 +1,11 @@
 package ru.parceldelivery.app.biz.validation
 
-import ru.parceldelovery.common.PDContext
+import ru.parceldelivery.common.PDContext
 import ru.parceldelivery.app.lib.ICorChainDsl
 import ru.parceldelivery.app.lib.worker
-import ru.parceldelovery.common.models.LogLevel
-import ru.parceldelovery.common.models.PDState
-import ru.parceldelovery.common.models.PDError
+import ru.parceldelivery.common.models.LogLevel
+import ru.parceldelivery.common.models.PDState
+import ru.parceldelivery.common.models.PDError
 
 fun ICorChainDsl<PDContext>.validateSenderIdNotBlank(title: String = "Проверка идентификатора отправителя") =
     worker(title) {
