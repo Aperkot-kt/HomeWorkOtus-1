@@ -2,6 +2,7 @@ package ru.parceldelivery.app.biz.operations
 
 import ru.parceldelivery.common.PDContext
 import ru.parceldelivery.app.biz.general.helpers.finishValidation
+import ru.parceldelivery.app.biz.general.helpers.prepareResponse
 import ru.parceldelivery.app.biz.general.operation
 import ru.parceldelivery.app.biz.general.stubs
 import ru.parceldelivery.app.biz.repo.repoSearch
@@ -25,4 +26,5 @@ fun ICorChainDsl<PDContext>.parcelSearch() = operation(PDCommand.SEARCH) {
         finishValidation()
         repoSearch()
     }
+    prepareResponse()
 }

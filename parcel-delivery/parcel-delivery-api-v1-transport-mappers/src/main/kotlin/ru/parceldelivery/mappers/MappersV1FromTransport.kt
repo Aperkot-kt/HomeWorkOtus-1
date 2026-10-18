@@ -65,7 +65,8 @@ private fun DeliveryCreateRequest.toInternal() = PDParcel(
     senderId = senderId?.let { PDUserId(it) } ?: PDUserId.NONE,
     receiverId = receiverId?.let { PDUserId(it) } ?: PDUserId.NONE,
     weight = weight,
-    dimensions = dimensions.toInternal()
+    dimensions = dimensions.toInternal(),
+    deliveryAddress = deliveryAddress ?: "",
 )
 
 private fun DeliverySearchRequest.toInternal() = PDFilter(

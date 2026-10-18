@@ -18,6 +18,7 @@ import ru.parceldelivery.common.models.PDCommand
 import ru.parceldelivery.common.models.PDError
 import ru.parceldelivery.common.models.PDParcel
 import ru.parceldelivery.common.models.PDParcelDimensions
+import ru.parceldelivery.common.models.PDParcelId
 import ru.parceldelivery.common.models.PDStatus
 import ru.parceldelivery.common.models.PDUserId
 
@@ -32,33 +33,38 @@ fun PDContext.toTransport(): IResponse = when (command) {
 }
 
 fun PDContext.toTransportCreate(): DeliveryCreateResponse = DeliveryCreateResponse(
+    responseType = "create",
     result = result,
     errors = transportErrors,
-    trackNumber = pdResponse.trackNumber.toString(),
-    parcel = pdResponse.toTransport()
+    trackNumber = pdResponse.trackNumber.takeIf { it != PDParcelId.NONE }?.toString(),
+    parcel = if (result == ResponseResult.SUCCESS) pdResponse.toTransport() else null
 )
 
 fun PDContext.toTransportRead(): DeliveryReadResponse = DeliveryReadResponse(
+    responseType = "read",
     result = result,
     errors = transportErrors,
-    parcel = pdResponse.toTransport()
+    parcel = if (result == ResponseResult.SUCCESS) pdResponse.toTransport() else null
 )
 
 fun PDContext.toTransportUpdate(): DeliveryUpdateResponse = DeliveryUpdateResponse(
+    responseType = "update",
     result = result,
     errors = transportErrors,
-    parcel = pdResponse.toTransport()
+    parcel = if (result == ResponseResult.SUCCESS) pdResponse.toTransport() else null
 )
 
 fun PDContext.toTransportDelete(): DeliveryDeleteResponse = DeliveryDeleteResponse(
+    responseType = "delete",
     result = result,
     errors = transportErrors
 )
 
 fun PDContext.toTransportSearch(): DeliverySearchResponse = DeliverySearchResponse(
+    responseType = "search",
     result = result,
     errors = transportErrors,
-    parcels = pdsResponse.map { it.toTransportSummary() }
+    parcels = if (result == ResponseResult.SUCCESS) pdsResponse.map { it.toTransportSummary() } else null
 )
 
 private val PDContext.result: ResponseResult

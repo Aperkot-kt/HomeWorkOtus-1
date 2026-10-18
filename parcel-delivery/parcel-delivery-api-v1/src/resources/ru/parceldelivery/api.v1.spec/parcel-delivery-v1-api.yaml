@@ -48,6 +48,7 @@ paths:
                     length: 40
                     width: 30
                     height: 20
+                  deliveryAddress: "г. Санкт-Петербург, ул. Невский пр., д. 10"
               search:
                 summary: Поиск посылок
                 value:
@@ -495,6 +496,10 @@ components:
               example: 5.5
             dimensions:
               $ref: '#/components/schemas/ParcelDimensions'
+            deliveryAddress:
+              type: string
+              description: Адрес доставки (адрес получателя)
+              example: "г. Санкт-Петербург, ул. Невский пр., д. 10"
           required:
             - requestType
             - senderId

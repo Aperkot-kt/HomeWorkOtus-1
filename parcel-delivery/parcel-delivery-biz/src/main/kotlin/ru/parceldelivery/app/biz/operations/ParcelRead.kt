@@ -3,6 +3,7 @@ package ru.parceldelivery.app.biz.operations
 import ru.parceldelivery.common.PDContext
 import ru.parceldelivery.app.biz.general.helpers.copyRequest
 import ru.parceldelivery.app.biz.general.helpers.finishValidation
+import ru.parceldelivery.app.biz.general.helpers.prepareResponse
 import ru.parceldelivery.app.biz.general.operation
 import ru.parceldelivery.app.biz.general.stubs
 import ru.parceldelivery.app.biz.repo.repoRead
@@ -31,4 +32,5 @@ fun ICorChainDsl<PDContext>.parcelRead() = operation(PDCommand.READ) {
         finishValidation()
         repoRead()
     }
+    prepareResponse()
 }

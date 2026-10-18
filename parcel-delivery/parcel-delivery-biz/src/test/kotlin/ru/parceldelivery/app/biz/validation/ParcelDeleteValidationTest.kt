@@ -1,7 +1,9 @@
 package ru.parceldelivery.app.biz.validation
 
 import kotlinx.coroutines.runBlocking
+import ru.parceldelivery.app.biz.FakeRepoPD
 import ru.parceldelivery.app.biz.PDProcessor
+import ru.parceldelivery.common.PDCorSettings
 import ru.parceldelivery.common.PDContext
 import ru.parceldelivery.common.models.PDCommand
 import ru.parceldelivery.common.models.PDParcel
@@ -14,7 +16,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class ParcelDeleteValidationTest {
-    private val processor = PDProcessor()
+    private val processor = PDProcessor(PDCorSettings(FakeRepoPD()))
 
     @Test
     fun `valid DELETE request has no errors`() = runBlocking {

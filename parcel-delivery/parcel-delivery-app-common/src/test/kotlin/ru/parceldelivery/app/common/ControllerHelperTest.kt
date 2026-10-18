@@ -1,6 +1,7 @@
 package ru.parceldelivery.app.common
 
 import kotlinx.coroutines.test.runTest
+import ru.parceldelivery.api.log.v1.PDLoggerProvider
 import ru.parceldelivery.api.v1.models.DeliveryCreateRequest
 import ru.parceldelivery.api.v1.models.DeliveryCreateResponse
 import ru.parceldelivery.api.v1.models.IRequest
@@ -8,6 +9,7 @@ import ru.parceldelivery.api.v1.models.IResponse
 import ru.parceldelivery.api.v1.models.ParcelDimensions
 import ru.parceldelivery.api.v1.models.RequestType
 import ru.parceldelivery.api.v1.models.ResponseResult
+import ru.parceldelivery.common.PDCorSettings
 import ru.parceldelivery.mappers.fromTransport
 import ru.parceldelivery.mappers.toTransport
 import kotlin.test.Test
@@ -27,6 +29,7 @@ class ControllerHelperTest {
     private val appSettings: IPDAppSettings = object : IPDAppSettings {
         override val corSettings: PDCorSettings = PDCorSettings()
         override val processor: PDParcelProcessor = PDParcelProcessor()
+        override val loggerProvider: PDLoggerProvider = PDLoggerProvider()
     }
 
     private suspend fun createParcel(request: DeliveryCreateRequest): DeliveryCreateResponse =

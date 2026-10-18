@@ -6,10 +6,14 @@ import ru.parceldelivery.app.lib.worker
 import ru.parceldelivery.common.models.LogLevel
 import ru.parceldelivery.common.models.PDState
 import ru.parceldelivery.common.models.PDError
+import ru.parceldelivery.common.models.PDUserId
 
 fun ICorChainDsl<PDContext>.validateSenderIdNotBlank(title: String = "Проверка идентификатора отправителя") =
     worker(title) {
-        if (state == PDState.RUNNING && pdValidating.senderId.asString().isBlank()) {
+        if (state == PDState.RUNNING &&
+            pdValidating.senderId != PDUserId.NONE &&
+            pdValidating.senderId.asString().isBlank()
+        ) {
             errors.add(
                 PDError(
                     code = "validation-sender-id-empty",

@@ -22,3 +22,13 @@ springdoc:
     urls:
       - name: v1
         url: /parcel-delivery-v1-api.yaml
+
+parcel-delivery:
+  repo:
+    type: postgres
+    config:
+      host: localhost
+      port: 5432
+      user: postgres
+      password: pd-pass
+      database: pd_pds

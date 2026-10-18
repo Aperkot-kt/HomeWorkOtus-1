@@ -12,8 +12,10 @@ import ru.parceldelivery.common.models.PDParcel
 import ru.parceldelivery.common.models.PDParcelId
 import ru.parceldelivery.common.models.PDStatus
 import ru.parceldelivery.common.models.PDUserId
+import ru.parceldelivery.common.models.mergeChangesFrom
 import ru.parcel.delivery.repo.common.IRepoPDInitializable
 import ru.parceldelivery.common.repo.*
+import java.time.OffsetDateTime
 
 class RepoPDSql(
     properties: SqlProperties,
@@ -89,14 +91,15 @@ class RepoPDSql(
 
             when {
                 current == null -> errorNotFound(trackNumber)
-                current.lock != lock -> errorRepoConcurrency(current, lock)
+                lock != PDLock.NONE && current.lock != lock -> errorRepoConcurrency(current, lock)
                 else -> block(current)
             }
         }
 
-    override suspend fun updatePD(rq: DbPDRequest): IDbPDResponse = update(rq.pd.trackNumber, rq.pd.lock) {
+    override suspend fun updatePD(rq: DbPDRequest): IDbPDResponse = update(rq.pd.trackNumber, rq.pd.lock) { current ->
+        val merged = current.mergeChangesFrom(rq.pd).copy(updatedAt = OffsetDateTime.now())
         val updated = pdTable.update(where = { pdTable.trackNumber eq rq.pd.trackNumber.asString() }) {
-            it.to(rq.pd.copy(lock = PDLock(randomUuid())), randomUuid)
+            it.to(merged.copy(lock = PDLock(randomUuid())), randomUuid)
         }
         if (updated == 0) errorNotFound(rq.pd.trackNumber) else repd(rq.pd.trackNumber)
     }

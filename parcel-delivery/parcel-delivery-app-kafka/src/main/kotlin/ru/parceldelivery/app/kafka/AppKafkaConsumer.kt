@@ -12,8 +12,6 @@ import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.errors.WakeupException
 import ru.parceldelivery.app.common.controllerHelper
-import ru.parceldelivery.app.kafka.AppKafkaConfig
-import ru.parceldelivery.app.kafka.IConsumerStrategy
 import java.time.Duration
 import java.util.*
 
@@ -26,7 +24,7 @@ class AppKafkaConsumer(
     private val consumer: Consumer<String, String> = config.createKafkaConsumer(),
     private val producer: Producer<String, String> = config.createKafkaProducer()
 ) : AutoCloseable {
-    private val log = config.corSettings.log
+    private val log = config.loggerProvider.logger("AppKafkaConsumer")
 
     @Volatile
     private var process = true
@@ -67,7 +65,7 @@ class AppKafkaConsumer(
                         )
                         sendResponse(resp, outputTopic)
                     } catch (ex: Exception) {
-                        log.error("error", ex)
+                        log.error("error", e = ex)
                     }
                 }
             }

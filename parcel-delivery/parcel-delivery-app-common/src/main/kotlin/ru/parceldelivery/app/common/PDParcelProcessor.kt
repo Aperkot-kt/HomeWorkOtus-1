@@ -17,9 +17,9 @@ import kotlin.random.Random
  *
  * Предполагается замена на полноценный бизнес-модуль.
  */
-class PDParcelProcessor {
+class PDParcelProcessor : IPDProcessor {
 
-    fun exec(context: PDContext) {
+    override suspend fun exec(context: PDContext) {
         when (context.command) {
             PDCommand.CREATE -> processCreate(context)
             PDCommand.READ -> processRead(context)

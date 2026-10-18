@@ -19,6 +19,12 @@ dependencies {
     // Внутренние модели
     implementation(project(":parcel-delivery-common"))
     implementation(project(":parcel-delivery-app-common"))
+    implementation(project(":parcel-delivery-api-log"))
+    implementation(project(":parcel-delivery-biz"))
+
+    // Репозитории
+    implementation(project(":parcel-delivery-repo-inmemory"))
+    implementation(project(":parcel-delivery-repo-pg"))
 
     // v1 api
     implementation(project(":parcel-delivery-api-v1"))

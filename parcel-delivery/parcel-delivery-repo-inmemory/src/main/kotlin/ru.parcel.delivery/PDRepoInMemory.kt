@@ -10,6 +10,8 @@ import ru.parceldelivery.common.models.PDParcel
 import ru.parceldelivery.common.models.PDParcelId
 import ru.parceldelivery.common.models.PDStatus
 import ru.parceldelivery.common.models.PDUserId
+import ru.parceldelivery.common.models.mergeChangesFrom
+import java.time.OffsetDateTime
 import ru.parceldelivery.common.repo.DbPDFilterRequest
 import ru.parceldelivery.common.repo.DbPDIdRequest
 import ru.parceldelivery.common.repo.DbPDRequest
@@ -21,7 +23,6 @@ import ru.parceldelivery.common.repo.IRepoPD
 import ru.parceldelivery.common.repo.PDRepoBase
 import ru.parceldelivery.common.repo.errorDb
 import ru.parceldelivery.common.repo.errorEmptyId
-import ru.parceldelivery.common.repo.errorEmptyLock
 import ru.parceldelivery.common.repo.errorNotFound
 import ru.parceldelivery.common.repo.errorRepoConcurrency
 import ru.parceldelivery.common.repo.exceptions.RepoEmptyLockException
@@ -69,16 +70,19 @@ class PDRepoInMemory(
         val rqPD = rq.pd
         val trackNumber = rqPD.trackNumber.takeIf { it != PDParcelId.NONE } ?: return@tryPDMethod errorEmptyId
         val key = trackNumber.asString()
-        val oldLock = rqPD.lock.takeIf { it != PDLock.NONE } ?: return@tryPDMethod errorEmptyLock(trackNumber)
+        val oldLock = rqPD.lock.takeIf { it != PDLock.NONE }
 
         mutex.withLock {
             val oldPD = cache.get(key)?.toInternal()
             when {
                 oldPD == null -> errorNotFound(trackNumber)
                 oldPD.lock == PDLock.NONE -> errorDb(RepoEmptyLockException(trackNumber))
-                oldPD.lock != oldLock -> errorRepoConcurrency(oldPD, oldLock)
+                oldLock != null && oldPD.lock != oldLock -> errorRepoConcurrency(oldPD, oldLock)
                 else -> {
-                    val newPD = rqPD.copy(lock = PDLock(randomUuid()))
+                    val newPD = oldPD.mergeChangesFrom(rqPD).copy(
+                        lock = PDLock(randomUuid()),
+                        updatedAt = OffsetDateTime.now(),
+                    )
                     val entity = PDEntity(newPD)
                     cache.put(key, entity)
                     DbPDResponseOk(newPD)
@@ -91,14 +95,15 @@ class PDRepoInMemory(
     override suspend fun deletePD(rq: DbPDIdRequest): IDbPDResponse = tryPDMethod {
         val trackNumber = rq.trackNumber.takeIf { it != PDParcelId.NONE } ?: return@tryPDMethod errorEmptyId
         val key = trackNumber.asString()
-        val oldLock = rq.lock.takeIf { it != PDLock.NONE } ?: return@tryPDMethod errorEmptyLock(trackNumber)
+        // Lock NONE означает удаление без оптимистической блокировки (API его не передает)
+        val oldLock = rq.lock.takeIf { it != PDLock.NONE }
 
         mutex.withLock {
             val oldPD = cache.get(key)?.toInternal()
             when {
                 oldPD == null -> errorNotFound(trackNumber)
                 oldPD.lock == PDLock.NONE -> errorDb(RepoEmptyLockException(trackNumber))
-                oldPD.lock != oldLock -> errorRepoConcurrency(oldPD, oldLock)
+                oldLock != null && oldPD.lock != oldLock -> errorRepoConcurrency(oldPD, oldLock)
                 else -> {
                     cache.invalidate(key)
                     DbPDResponseOk(oldPD)

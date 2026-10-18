@@ -6,5 +6,7 @@ package ru.parceldelivery.common.models
 enum class LogLevel {
     INFO,
     WARN,
+    TRACE,
     ERROR,
+    DEBUG,
 }

@@ -16,6 +16,7 @@ data class PDContext(
     var state: PDState = PDState.NONE,
     var errors: MutableList<PDError> = mutableListOf(),
 
+    var corSettings: PDCorSettings = PDCorSettings(),
     var workMode: PDWorkMode = PDWorkMode.PROD,
     var stubCase: ContextStubs = ContextStubs.NONE,
 

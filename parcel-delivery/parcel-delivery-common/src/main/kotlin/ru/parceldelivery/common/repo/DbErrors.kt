@@ -37,7 +37,7 @@ fun errorRepoConcurrency(
         actualLock = oldPD.lock,
     ),
 ) = DbPDResponseErrWithData(
-    pd = oldPD,
+    data = oldPD,
     err = PDError(
         code = "$ERROR_GROUP_REPO-concurrency",
         group = ERROR_GROUP_REPO,

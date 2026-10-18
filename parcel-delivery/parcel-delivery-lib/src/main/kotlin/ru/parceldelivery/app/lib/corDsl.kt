@@ -73,7 +73,7 @@ fun <T> ICorChainDsl<T>.worker(function: ICorWorkerDsl<T>.() -> Unit) {
 fun <T> ICorChainDsl<T>.worker(
     title: String,
     description: String = "",
-    blockHandle: T.() -> Unit
+    blockHandle: suspend T.() -> Unit
 ) {
     add(CorWorkerDsl<T>().also {
         it.title = title

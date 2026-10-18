@@ -18,7 +18,7 @@ suspend inline fun <T> IPDAppSettings.controllerHelper(
     clazz: KClass<*>,
     logId: String,
 ): T {
-    val logger = corSettings.log
+    val logger = loggerProvider.logger(clazz)
     val ctx = PDContext(timeStart = Clock.System.now())
     return try {
         ctx.getRequest()
