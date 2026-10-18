@@ -1,7 +1,8 @@
 package ru.parceldelivery.app.kafka
 
+import ru.parceldelivery.api.log.v1.PDLoggerProvider
 import ru.parceldelivery.app.common.IPDAppSettings
-import ru.parceldelivery.app.common.PDCorSettings
+import ru.parceldelivery.common.PDCorSettings
 import ru.parceldelivery.app.common.PDParcelProcessor
 
 /**
@@ -16,6 +17,7 @@ class AppKafkaConfig(
     val kafkaTopicNotification: String = KAFKA_TOPIC_NOTIFICATION,
     override val corSettings: PDCorSettings = PDCorSettings(),
     override val processor: PDParcelProcessor = PDParcelProcessor(),
+    override val loggerProvider: PDLoggerProvider = PDLoggerProvider(),
 ): IPDAppSettings {
     companion object {
         const val KAFKA_HOST_VAR = "KAFKA_HOSTS"

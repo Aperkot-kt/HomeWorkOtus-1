@@ -1,13 +1,13 @@
 package ru.parceldelivery.app.common
 
-import ru.parceldelovery.common.PDContext
-import ru.parceldelovery.common.models.PDCommand
-import ru.parceldelovery.common.models.PDError
-import ru.parceldelovery.common.models.PDParcel
-import ru.parceldelovery.common.models.PDParcelDimensions
-import ru.parceldelovery.common.models.PDParcelId
-import ru.parceldelovery.common.models.PDStatus
-import ru.parceldelovery.common.models.PDUserId
+import ru.parceldelivery.common.PDContext
+import ru.parceldelivery.common.models.PDCommand
+import ru.parceldelivery.common.models.PDError
+import ru.parceldelivery.common.models.PDParcel
+import ru.parceldelivery.common.models.PDParcelDimensions
+import ru.parceldelivery.common.models.PDParcelId
+import ru.parceldelivery.common.models.PDStatus
+import ru.parceldelivery.common.models.PDUserId
 import java.time.OffsetDateTime
 import kotlin.random.Random
 
@@ -17,9 +17,9 @@ import kotlin.random.Random
  *
  * Предполагается замена на полноценный бизнес-модуль.
  */
-class PDParcelProcessor {
+class PDParcelProcessor : IPDProcessor {
 
-    fun exec(context: PDContext) {
+    override suspend fun exec(context: PDContext) {
         when (context.command) {
             PDCommand.CREATE -> processCreate(context)
             PDCommand.READ -> processRead(context)

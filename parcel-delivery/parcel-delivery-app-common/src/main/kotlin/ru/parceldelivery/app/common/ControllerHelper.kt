@@ -1,11 +1,11 @@
 package ru.parceldelivery.app.common
 
 import kotlinx.datetime.Clock
-import ru.parceldelovery.common.PDContext
-import ru.parceldelovery.common.models.LogLevel
-import ru.parceldelovery.common.models.PDCommand
-import ru.parceldelovery.common.models.PDError
-import ru.parceldelovery.common.models.PDState
+import ru.parceldelivery.common.PDContext
+import ru.parceldelivery.common.models.LogLevel
+import ru.parceldelivery.common.models.PDCommand
+import ru.parceldelivery.common.models.PDError
+import ru.parceldelivery.common.models.PDState
 import kotlin.reflect.KClass
 
 /**
@@ -18,7 +18,7 @@ suspend inline fun <T> IPDAppSettings.controllerHelper(
     clazz: KClass<*>,
     logId: String,
 ): T {
-    val logger = corSettings.log
+    val logger = loggerProvider.logger(clazz)
     val ctx = PDContext(timeStart = Clock.System.now())
     return try {
         ctx.getRequest()

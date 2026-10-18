@@ -12,14 +12,15 @@ import ru.parceldelivery.api.v1.models.ParcelDimensions
 import ru.parceldelivery.api.v1.models.ParcelStatus
 import ru.parceldelivery.api.v1.models.ParcelSummary
 import ru.parceldelivery.api.v1.models.ResponseResult
-import ru.parceldelovery.common.PDContext
-import ru.parceldelovery.common.exception.UnknownContextCommand
-import ru.parceldelovery.common.models.PDCommand
-import ru.parceldelovery.common.models.PDError
-import ru.parceldelovery.common.models.PDParcel
-import ru.parceldelovery.common.models.PDParcelDimensions
-import ru.parceldelovery.common.models.PDStatus
-import ru.parceldelovery.common.models.PDUserId
+import ru.parceldelivery.common.PDContext
+import ru.parceldelivery.common.exception.UnknownContextCommand
+import ru.parceldelivery.common.models.PDCommand
+import ru.parceldelivery.common.models.PDError
+import ru.parceldelivery.common.models.PDParcel
+import ru.parceldelivery.common.models.PDParcelDimensions
+import ru.parceldelivery.common.models.PDParcelId
+import ru.parceldelivery.common.models.PDStatus
+import ru.parceldelivery.common.models.PDUserId
 
 
 fun PDContext.toTransport(): IResponse = when (command) {
@@ -32,33 +33,38 @@ fun PDContext.toTransport(): IResponse = when (command) {
 }
 
 fun PDContext.toTransportCreate(): DeliveryCreateResponse = DeliveryCreateResponse(
+    responseType = "create",
     result = result,
     errors = transportErrors,
-    trackNumber = pdResponse.trackNumber.toString(),
-    parcel = pdResponse.toTransport()
+    trackNumber = pdResponse.trackNumber.takeIf { it != PDParcelId.NONE }?.toString(),
+    parcel = if (result == ResponseResult.SUCCESS) pdResponse.toTransport() else null
 )
 
 fun PDContext.toTransportRead(): DeliveryReadResponse = DeliveryReadResponse(
+    responseType = "read",
     result = result,
     errors = transportErrors,
-    parcel = pdResponse.toTransport()
+    parcel = if (result == ResponseResult.SUCCESS) pdResponse.toTransport() else null
 )
 
 fun PDContext.toTransportUpdate(): DeliveryUpdateResponse = DeliveryUpdateResponse(
+    responseType = "update",
     result = result,
     errors = transportErrors,
-    parcel = pdResponse.toTransport()
+    parcel = if (result == ResponseResult.SUCCESS) pdResponse.toTransport() else null
 )
 
 fun PDContext.toTransportDelete(): DeliveryDeleteResponse = DeliveryDeleteResponse(
+    responseType = "delete",
     result = result,
     errors = transportErrors
 )
 
 fun PDContext.toTransportSearch(): DeliverySearchResponse = DeliverySearchResponse(
+    responseType = "search",
     result = result,
     errors = transportErrors,
-    parcels = pdsResponse.map { it.toTransportSummary() }
+    parcels = if (result == ResponseResult.SUCCESS) pdsResponse.map { it.toTransportSummary() } else null
 )
 
 private val PDContext.result: ResponseResult

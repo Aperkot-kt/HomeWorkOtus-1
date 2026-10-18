@@ -8,6 +8,8 @@
 **/*.iml
 
 /.kotlin/
+/parcel-delivery/.gradle
+/parcel-delivery/.kotlin
 
 ### Mac OS ###
 .DS_Store

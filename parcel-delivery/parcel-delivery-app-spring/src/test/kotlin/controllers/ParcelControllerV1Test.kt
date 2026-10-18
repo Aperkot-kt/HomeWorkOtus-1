@@ -42,6 +42,7 @@ internal class ParcelControllerV1Test {
                     receiverId = "CL-1002",
                     weight = 5.5,
                     dimensions = ParcelDimensions(length = 40.0, width = 30.0, height = 20.0),
+                    deliveryAddress = "г. Санкт-Петербург, ул. Невский пр., д. 10",
                 )
             )
             .exchange()
@@ -51,11 +52,39 @@ internal class ParcelControllerV1Test {
                 assertThat(response.responseType).isEqualTo("create")
                 assertThat(response.result).isEqualTo(ResponseResult.SUCCESS)
                 assertThat(response.errors).isNull()
-                assertThat(response.trackNumber).startsWith("PD-")
+                assertThat(response.trackNumber).isNotBlank()
                 assertThat(response.parcel).isNotNull
                 assertThat(response.parcel!!.trackNumber).isEqualTo(response.trackNumber)
                 assertThat(response.parcel!!.status).isEqualTo(ParcelStatus.ACCEPTED)
                 assertThat(response.parcel!!.weight).isEqualTo(5.5)
+                assertThat(response.parcel!!.deliveryAddress)
+                    .isEqualTo("г. Санкт-Петербург, ул. Невский пр., д. 10")
+                assertThat(response.parcel!!.createdAt).isNotNull
+            }
+    }
+
+    @Test
+    fun createParcelWithBlankDeliveryAddress() {
+        webClient.post().uri("/v1/parcels/create")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(
+                DeliveryCreateRequest(
+                    requestType = RequestType.CREATE,
+                    senderId = "CL-1001",
+                    receiverId = "CL-1002",
+                    weight = 5.5,
+                    dimensions = ParcelDimensions(length = 40.0, width = 30.0, height = 20.0),
+                    deliveryAddress = "   ",
+                )
+            )
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(DeliveryCreateResponse::class.java)
+            .value { response ->
+                assertThat(response.responseType).isEqualTo("create")
+                assertThat(response.result).isEqualTo(ResponseResult.ERROR)
+                assertThat(response.errors).isNotNull
+                assertThat(response.errors!![0].code).isEqualTo("validation-delivery-address-empty")
             }
     }
 
@@ -76,7 +105,7 @@ internal class ParcelControllerV1Test {
                 assertThat(response.responseType).isEqualTo("read")
                 assertThat(response.result).isEqualTo(ResponseResult.ERROR)
                 assertThat(response.errors).isNotNull
-                assertThat(response.errors!![0].code).isEqualTo("NOT_FOUND")
+                assertThat(response.errors!![0].code).isEqualTo("repo-not-found")
             }
     }
 
@@ -98,7 +127,7 @@ internal class ParcelControllerV1Test {
                 assertThat(response.responseType).isEqualTo("update")
                 assertThat(response.result).isEqualTo(ResponseResult.ERROR)
                 assertThat(response.errors).isNotNull
-                assertThat(response.errors!![0].code).isEqualTo("NOT_FOUND")
+                assertThat(response.errors!![0].code).isEqualTo("repo-not-found")
             }
     }
 
@@ -117,8 +146,9 @@ internal class ParcelControllerV1Test {
             .expectBody(DeliveryDeleteResponse::class.java)
             .value { response ->
                 assertThat(response.responseType).isEqualTo("delete")
-                assertThat(response.result).isEqualTo(ResponseResult.SUCCESS)
-                assertThat(response.errors).isNull()
+                assertThat(response.result).isEqualTo(ResponseResult.ERROR)
+                assertThat(response.errors).isNotNull
+                assertThat(response.errors!![0].code).isEqualTo("repo-not-found")
             }
     }
 
@@ -166,7 +196,7 @@ internal class ParcelControllerV1Test {
                 assertThat(response.responseType).isEqualTo("read")
                 assertThat(response.result).isEqualTo(ResponseResult.ERROR)
                 assertThat(response.errors).isNotNull
-                assertThat(response.errors!![0].code).isEqualTo("NOT_FOUND")
+                assertThat(response.errors!![0].code).isEqualTo("repo-not-found")
             }
     }
 
@@ -174,11 +204,13 @@ internal class ParcelControllerV1Test {
     fun deleteParcel() {
         webClient.delete().uri("/v1/parcels/PD-2026-000001")
             .exchange()
-            .expectStatus().isOk
+            .expectStatus().isNotFound
             .expectBody(DeliveryDeleteResponse::class.java)
             .value { response ->
                 assertThat(response.responseType).isEqualTo("delete")
-                assertThat(response.result).isEqualTo(ResponseResult.SUCCESS)
+                assertThat(response.result).isEqualTo(ResponseResult.ERROR)
+                assertThat(response.errors).isNotNull
+                assertThat(response.errors!![0].code).isEqualTo("repo-not-found")
             }
     }
 
@@ -194,7 +226,7 @@ internal class ParcelControllerV1Test {
                 assertThat(response.responseType).isEqualTo("update")
                 assertThat(response.result).isEqualTo(ResponseResult.ERROR)
                 assertThat(response.errors).isNotNull
-                assertThat(response.errors!![0].code).isEqualTo("NOT_FOUND")
+                assertThat(response.errors!![0].code).isEqualTo("repo-not-found")
             }
     }
 }

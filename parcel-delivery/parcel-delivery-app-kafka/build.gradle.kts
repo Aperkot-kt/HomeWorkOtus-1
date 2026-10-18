@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":parcel-delivery-api-v1-transport-mappers"))
     implementation(project(":parcel-delivery-common"))
     implementation(project(":parcel-delivery-app-common"))
+    implementation(project(":parcel-delivery-api-log"))
 
     implementation(libs.coroutines.core)
     implementation(libs.kafka.clients)

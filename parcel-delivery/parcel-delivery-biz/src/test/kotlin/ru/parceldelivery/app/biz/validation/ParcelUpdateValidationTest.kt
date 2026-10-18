@@ -1,16 +1,18 @@
 package ru.parceldelivery.app.biz.validation
 
 import kotlinx.coroutines.runBlocking
+import ru.parceldelivery.app.biz.FakeRepoPD
 import ru.parceldelivery.app.biz.PDProcessor
-import ru.parceldelovery.common.PDContext
-import ru.parceldelovery.common.models.*
-import ru.parceldelovery.common.stubs.ContextStubs
+import ru.parceldelivery.common.PDCorSettings
+import ru.parceldelivery.common.PDContext
+import ru.parceldelivery.common.models.*
+import ru.parceldelivery.common.stubs.ContextStubs
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class ParcelUpdateValidationTest {
-    private val processor = PDProcessor()
+    private val processor = PDProcessor(PDCorSettings(FakeRepoPD()))
 
     private fun validContext() = PDContext(
         command = PDCommand.UPDATE,
@@ -42,19 +44,17 @@ class ParcelUpdateValidationTest {
     }
 
     @Test
-    fun `blank delivery address causes validation error`() = runBlocking {
-        val ctx = validContext().copy(pdRequest = validContext().pdRequest.copy(deliveryAddress = ""))
+    fun `status-only update passes validation`() = runBlocking {
+        // PATCH /status передает только trackNumber и status: остальное подтянется из хранилища
+        val ctx = validContext().copy(
+            pdRequest = PDParcel(
+                trackNumber = PDParcelId("test-id"),
+                status = PDStatus.IN_TRANSIT,
+            ),
+        )
         processor.exec(ctx)
-        assertTrue(ctx.errors.any { it.code == "validation-delivery-address-empty" })
-        assertEquals(PDState.FAILING, ctx.state)
-    }
-
-    @Test
-    fun `zero weight causes validation error`() = runBlocking {
-        val ctx = validContext().copy(pdRequest = validContext().pdRequest.copy(weight = 0.0))
-        processor.exec(ctx)
-        assertTrue(ctx.errors.any { it.code == "validation-weight-not-positive" })
-        assertEquals(PDState.FAILING, ctx.state)
+        assertTrue(ctx.errors.isEmpty(), "Expected no errors but got: ${ctx.errors}")
+        assertEquals(PDState.FINISHING, ctx.state)
     }
 
     @Test

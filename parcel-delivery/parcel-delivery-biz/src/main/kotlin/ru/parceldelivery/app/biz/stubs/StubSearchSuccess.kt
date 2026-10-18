@@ -1,14 +1,14 @@
 package ru.parceldelivery.app.biz.stubs
 
-import ru.parceldelovery.common.PDContext
+import ru.parceldelivery.common.PDContext
 import ru.parceldelivery.app.lib.ICorChainDsl
 import ru.parceldelivery.app.lib.worker
-import ru.parceldelovery.common.models.PDState
-import ru.parceldelovery.common.stubs.ContextStubs
-import ru.parceldelovery.common.models.PDParcel
-import ru.parceldelovery.common.models.PDParcelId
-import ru.parceldelovery.common.models.PDStatus
-import ru.parceldelovery.common.models.PDUserId
+import ru.parceldelivery.common.models.PDState
+import ru.parceldelivery.common.stubs.ContextStubs
+import ru.parceldelivery.common.models.PDParcel
+import ru.parceldelivery.common.models.PDParcelId
+import ru.parceldelivery.common.models.PDStatus
+import ru.parceldelivery.common.models.PDUserId
 
 fun ICorChainDsl<PDContext>.stubSearchSuccess(title: String = "Имитация успешного поиска") = worker(title) {
     if (stubCase == ContextStubs.SUCCESS) {
